@@ -13,8 +13,10 @@ struct PokemonApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PokemonListView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            NavigationView {
+                PokemonListView()
+                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            }
         }
     }
 }

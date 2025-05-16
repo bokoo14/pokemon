@@ -106,6 +106,8 @@ class PokemonListViewModel: ObservableObject {
                 id: pokemon.id,
                 name: pokemon.name,
                 imageURL: pokemon.imageURL,
+                types: pokemon.types,
+                logoImage: pokemon.logoImage,
                 isFavorite: !pokemon.isFavorite
             )
         }

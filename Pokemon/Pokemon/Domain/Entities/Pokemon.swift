@@ -11,5 +11,7 @@ struct Pokemon: Identifiable {
     let id: String
     let name: String
     let imageURL: String
+    let types: [String]?
+    let logoImage: String
     let isFavorite: Bool
 }

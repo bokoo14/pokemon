@@ -41,6 +41,8 @@ extension Card {
             id: id,
             name: name,
             imageURL: images.small.absoluteString,
+            types: types,
+            logoImage: set.images.logo.absoluteString,
             isFavorite: isFavorite
         )
     }
