@@ -53,6 +53,6 @@ struct PokemonCardView: View {
 
 #Preview {
     PokemonCardView(pokemon:
-                        Pokemon(id: 1, name: "포켓몬 1", imageURL: "", isFavorite: true), onToggleFavorite: {}
+                        Pokemon(id: "1", name: "포켓몬 1", imageURL: "", isFavorite: true), onToggleFavorite: {}
     )
 }

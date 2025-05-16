@@ -8,7 +8,7 @@
 import Foundation
 
 struct Pokemon: Identifiable {
-    let id: Int
+    let id: String
     let name: String
     let imageURL: String
     let isFavorite: Bool

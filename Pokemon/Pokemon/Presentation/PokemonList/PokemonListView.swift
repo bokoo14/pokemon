@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
-
-import SwiftUI
+import Swinject
 
 struct PokemonListView: View {
-    @StateObject private var viewModel = PokemonListViewModel()
-    
+    @StateObject private var viewModel: PokemonListViewModel
+        
+    init() {
+        let resolvedViewModel = DependencyContainer.shared.container.resolve(PokemonListViewModel.self)!
+        _viewModel = StateObject(wrappedValue: resolvedViewModel)
+    }
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -22,9 +25,9 @@ struct PokemonListView: View {
             // 즐겨찾기
             HStack {
                 Spacer()
-                Toggle(isOn: $viewModel.showFavoritesOnly) {
-                    Image(systemName: viewModel.showFavoritesOnly ? "star.fill" : "star")
-                        .foregroundStyle(.yellow)
+                Toggle(isOn: $viewModel.isShowFavoritesOnly) {
+                    Image(systemName: viewModel.isShowFavoritesOnly ? "star.fill" : "star")
+                        .foregroundStyle(viewModel.isShowFavoritesOnly ? .yellow : .gray)
                 }
                 .toggleStyle(.button)
                 .buttonStyle(PlainButtonStyle())
@@ -48,19 +51,25 @@ struct PokemonListView: View {
             // 카드 리스트
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    if viewModel.isLoading {
-                        // 로딩 중 - Skeleton UI
-                        ForEach(0..<10, id: \.self) { _ in
-                            SkeletonCardView()
-                        }
-                    } else {
-                        ForEach(viewModel.filteredPokemons) { pokemon in
-                            PokemonCardView(
-                                pokemon: pokemon,
-                                onToggleFavorite: {
-                                    viewModel.toggleFavorite(for: pokemon.id)
+                    ForEach(viewModel.filteredPokemons) { pokemon in
+                        PokemonCardView(
+                            pokemon: pokemon,
+                            onToggleFavorite: {
+                                viewModel.toggleFavorite(for: pokemon.id)
+                            }
+                        )
+                    }
+                    if !viewModel.isShowFavoritesOnly {
+                        if viewModel.isLoadingMore {
+                            ProgressView()
+                                .gridCellColumns(2)
+                        } else if viewModel.hasMoreData {
+                            Color.clear
+                                .frame(height: 50)
+                                .gridCellColumns(2)
+                                .onAppear {
+                                    viewModel.loadMoreIfNeeded()
                                 }
-                            )
                         }
                     }
                 }
@@ -73,4 +82,3 @@ struct PokemonListView: View {
 #Preview {
     PokemonListView()
 }
-

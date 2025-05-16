@@ -13,7 +13,7 @@ struct PokemonApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PokemonListView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
