@@ -176,6 +176,15 @@ class PokemonListViewModel: ObservableObject {
         loadPokemons(refresh: true)
     }
     
+    // 필터 초기화
+    func resetFilters() {
+        selectedSuperType = nil
+        selectedTypes.removeAll()
+        currentPage = 1
+        isShowFavoritesOnly = false
+        loadPokemons(refresh: true)
+    }
+    
     // 검색
     private func subscribeSearchText() {
         $searchText

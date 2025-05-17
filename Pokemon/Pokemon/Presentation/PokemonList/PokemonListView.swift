@@ -92,28 +92,58 @@ struct PokemonListView: View {
                             SkeletonCardView()
                         }
                     } else {
-                        ForEach(viewModel.filteredPokemons) { pokemon in
-                            PokemonCardView(
-                                pokemon: pokemon,
-                                onToggleFavorite: {
-                                    viewModel.toggleFavorite(for: pokemon.id)
-                                }
-                            )
+                        Group {
+                            if viewModel.filteredPokemons.isEmpty {
+                                resetFilterButton
+                                    .gridCellColumns(10)
+                            } else {
+                                pokemonCardList
+                            }
                         }
                     }
-                    
-                    if !viewModel.isShowFavoritesOnly {
-                        if viewModel.isLoadingMore {
-                            ProgressView()
-                        } else if viewModel.hasMoreData {
-                            Color.clear
-                                .frame(height: 50)
-                                .gridCellColumns(2)
-                                .onAppear {
-                                    viewModel.loadMoreIfNeeded()
-                                }
+                    // 스크롤 시 해당 섹션 도달 시 더 불러오기
+                    loadMoreSection
+                }
+            }
+        }
+    }
+    
+    private var resetFilterButton: some View {
+        Button {
+            viewModel.resetFilters()
+        } label: {
+            Text("필터 초기화")
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.black)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+        }
+    }
+    
+    private var pokemonCardList: some View {
+        ForEach(viewModel.filteredPokemons) { pokemon in
+            PokemonCardView(
+                pokemon: pokemon,
+                onToggleFavorite: {
+                    viewModel.toggleFavorite(for: pokemon.id)
+                }
+            )
+        }
+    }
+    
+    private var loadMoreSection: some View {
+        Group {
+            if !viewModel.isShowFavoritesOnly {
+                if viewModel.isLoadingMore {
+                    ProgressView()
+                } else if viewModel.hasMoreData {
+                    Color.clear
+                        .frame(height: 50)
+                        .gridCellColumns(2)
+                        .onAppear {
+                            viewModel.loadMoreIfNeeded()
                         }
-                    }
                 }
             }
         }
