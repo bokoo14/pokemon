@@ -5,6 +5,7 @@
 //  Created by bokyung on 5/15/25.
 //
 
+import Kingfisher
 import SwiftUI
 
 struct PokemonCardView: View {
@@ -17,15 +18,14 @@ struct PokemonCardView: View {
         } label: {
             VStack {
                 if !pokemon.imageURL.isEmpty, let url = URL(string: pokemon.imageURL) {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    } placeholder: {
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .aspectRatio(0.75, contentMode: .fit)
-                    }
+                    KFImage(url)
+                        .resizable()
+                        .placeholder {
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.3))
+                                .aspectRatio(0.75, contentMode: .fit)
+                        }
+                        .aspectRatio(0.75, contentMode: .fit)
                 } else {
                     Rectangle()
                         .fill(Color.gray.opacity(0.3))

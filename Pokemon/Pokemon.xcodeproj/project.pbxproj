@@ -37,6 +37,7 @@
 		88A5AFCE2DD84B6C004A5CD3 /* TypesRepositoryImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFCD2DD84B6C004A5CD3 /* TypesRepositoryImp.swift */; };
 		88A5AFD02DD85282004A5CD3 /* SelectableRoundedButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFCF2DD85282004A5CD3 /* SelectableRoundedButton.swift */; };
 		88A5AFD32DD87A80004A5CD3 /* PokemonCardQueryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFD22DD87A80004A5CD3 /* PokemonCardQueryBuilder.swift */; };
+		88A5AFD62DD8803C004A5CD3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 88A5AFD52DD8803C004A5CD3 /* Kingfisher */; };
 		88FC33ED2DD58CCE006E18E5 /* PokemonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FC33DE2DD58CCE006E18E5 /* PokemonApp.swift */; };
 		88FC33EE2DD58CCE006E18E5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FC33E82DD58CCE006E18E5 /* ContentView.swift */; };
 		88FC33EF2DD58CCE006E18E5 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FC33E92DD58CCE006E18E5 /* Persistence.swift */; };
@@ -111,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88A5AFD62DD8803C004A5CD3 /* Kingfisher in Frameworks */,
 				88A5AF7F2DD5ED6A004A5CD3 /* Alamofire in Frameworks */,
 				88A5AF922DD6304F004A5CD3 /* Swinject in Frameworks */,
 			);
@@ -413,6 +415,7 @@
 			packageProductDependencies = (
 				88A5AF7E2DD5ED6A004A5CD3 /* Alamofire */,
 				88A5AF912DD6304F004A5CD3 /* Swinject */,
+				88A5AFD52DD8803C004A5CD3 /* Kingfisher */,
 			);
 			productName = Pokemon;
 			productReference = 88FC33822DD5826B006E18E5 /* Pokemon.app */;
@@ -493,6 +496,7 @@
 			packageReferences = (
 				88A5AF7D2DD5ED6A004A5CD3 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				88A5AF902DD6304F004A5CD3 /* XCRemoteSwiftPackageReference "Swinject" */,
+				88A5AFD42DD8803C004A5CD3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 88FC33832DD5826B006E18E5 /* Products */;
@@ -913,6 +917,14 @@
 				minimumVersion = 2.9.1;
 			};
 		};
+		88A5AFD42DD8803C004A5CD3 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -925,6 +937,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 88A5AF902DD6304F004A5CD3 /* XCRemoteSwiftPackageReference "Swinject" */;
 			productName = Swinject;
+		};
+		88A5AFD52DD8803C004A5CD3 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 88A5AFD42DD8803C004A5CD3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 
