@@ -44,7 +44,8 @@ class PokemonListViewModel: ObservableObject {
         self.loadPokemonUseCase = loadPokemonUseCase
         self.fetchSupertypesUseCase = fetchSupertypesUseCase
         self.fetchTypesUseCase = fetchTypesUseCase
-        setupSearchTextSubscription()
+        subscribeSearchText()
+        subscribeFilters()
         loadSuperTypes()
         loadTypes()
         loadPokemons()
@@ -175,12 +176,76 @@ class PokemonListViewModel: ObservableObject {
         loadPokemons(refresh: true)
     }
     
-    private func setupSearchTextSubscription() {
+    // 검색
+    private func subscribeSearchText() {
         $searchText
-            .removeDuplicates()
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.handleSearchTextChanged()
+            .removeDuplicates()
+            .map { [weak self] text -> AnyPublisher<[Pokemon], Never> in
+                guard let self = self else {
+                    return Just([]).eraseToAnyPublisher()
+                }
+
+                self.isLoading = true
+                self.errorMessage = nil
+                self.currentPage = 1
+
+                return self.loadPokemonUseCase.execute(
+                    page: self.currentPage,
+                    searchText: text.isEmpty ? nil : text,
+                    selectedSuperType: self.selectedSuperType,
+                    selectedTypes: self.selectedTypes
+                )
+                .catch { error -> Just<[Pokemon]> in
+                    self.errorMessage = error.localizedDescription
+                    return Just([])
+                }
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            .sink { [weak self] newPokemons in
+                guard let self = self else { return }
+                self.pokemons = newPokemons
+                self.hasMoreData = newPokemons.count >= 20
+                self.isLoading = false
+            }
+            .store(in: &cancellables)
+    }
+    
+    // 필터 (슈퍼 타입 + 타입)
+    private func subscribeFilters() {
+        Publishers.CombineLatest($selectedSuperType, $selectedTypes)
+            .removeDuplicates { lhs, rhs in
+                lhs.0 == rhs.0 && lhs.1 == rhs.1
+            }
+            .map { [weak self] superType, types -> AnyPublisher<[Pokemon], Never> in
+                guard let self = self else { return Just([]).eraseToAnyPublisher() }
+                
+                self.isLoading = true
+                self.errorMessage = nil
+                self.currentPage = 1
+                
+                return self.loadPokemonUseCase.execute(
+                    page: self.currentPage,
+                    searchText: self.searchText.isEmpty ? nil : self.searchText,
+                    selectedSuperType: superType,
+                    selectedTypes: types
+                )
+                .catch { error -> Just<[Pokemon]> in
+                    self.errorMessage = error.localizedDescription
+                    return Just([])
+                }
+                .receive(on: DispatchQueue.main)
+                .eraseToAnyPublisher()
+            }
+            .switchToLatest()
+            .sink { [weak self] newPokemons in
+                guard let self = self else { return }
+                
+                self.pokemons = newPokemons
+                self.hasMoreData = newPokemons.count >= 20
+                self.isLoading = false
             }
             .store(in: &cancellables)
     }
