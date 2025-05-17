@@ -18,17 +18,19 @@ class PokemonCardRepositoryImp: PokemonCardRepository {
         self.networkService = networkService
     }
     
-    func fetchCards(page: Int, query: String?) async throws -> [Pokemon] {
+    func fetchCards(page: Int, searchText: String?, selectedSuperType: String?, selectedTypes: Set<String>) async throws -> [Pokemon] {
         let request = GetPokemonsRequest(
             baseURL: baseURL,
             page: page,
-            queryText: query
+            searchText: searchText,
+            selectedSuperType: selectedSuperType,
+            selectedTypes: selectedTypes
         )
         let response = try await networkService.request(request)
         return response.data.map { $0.toDomain() }
     }
     
-    func fetchCardsPublisher(page: Int, query: String?) -> AnyPublisher<[Pokemon], Error> {
+    func fetchCardsPublisher(page: Int, searchText: String?, selectedSuperType: String?, selectedTypes: Set<String>) -> AnyPublisher<[Pokemon], Error> {
         return Future<[Pokemon], Error> { [weak self] promise in
             guard let self = self else {
                 promise(.failure(NSError(domain: "Repository deallocated", code: -1)))
@@ -37,7 +39,7 @@ class PokemonCardRepositoryImp: PokemonCardRepository {
             
             Task {
                 do {
-                    let pokemons = try await self.fetchCards(page: page, query: query)
+                    let pokemons = try await self.fetchCards(page: page, searchText: searchText, selectedSuperType: selectedSuperType, selectedTypes: selectedTypes)
                     promise(.success(pokemons))
                 } catch {
                     promise(.failure(error))

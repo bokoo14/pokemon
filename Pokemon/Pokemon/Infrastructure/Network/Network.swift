@@ -27,6 +27,9 @@ class NetworkServiceImp: NetworkService {
                     continuation.resume(throwing: error)
                 }
             }
+            .cURLDescription { description in
+                print("cURL: \(description)")
+            }
         }
     }
 }

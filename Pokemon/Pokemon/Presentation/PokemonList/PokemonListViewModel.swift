@@ -33,9 +33,6 @@ class PokemonListViewModel: ObservableObject {
         if isShowFavoritesOnly {
             list = list.filter { $0.isFavorite }
         }
-        if !searchText.isEmpty {
-            list = list.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
         return list
     }
     
@@ -79,7 +76,7 @@ class PokemonListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    // 포켓몬 데이터 로드
+    // 포켓몬 데이터
     func loadPokemons(refresh: Bool = true) {
         if isRequestInProgress { return }
         
@@ -90,41 +87,44 @@ class PokemonListViewModel: ObservableObject {
         } else {
             isLoadingMore = true
         }
-        
+
         isRequestInProgress = true
-        
-        let query = searchText.isEmpty ? nil : searchText
-        
-        loadPokemonUseCase.execute(page: currentPage, query: query)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
-                guard let self = self else { return }
-                self.isRequestInProgress = false
-                
-                if refresh {
-                    self.isLoading = false
-                } else {
-                    self.isLoadingMore = false
-                }
-                
-                if case let .failure(error) = completion {
-                    self.errorMessage = error.localizedDescription
-                    print("데이터 로드 실패: \(error.localizedDescription)")
-                }
-            } receiveValue: { [weak self] newPokemons in
-                guard let self = self else { return }
-                
-                if refresh {
-                    self.pokemons = newPokemons
-                } else {
-                    let existingIds = Set(self.pokemons.map { $0.id })
-                    let uniqueNewPokemons = newPokemons.filter { !existingIds.contains($0.id) }
-                    self.pokemons.append(contentsOf: uniqueNewPokemons)
-                }
-                
-                self.hasMoreData = newPokemons.count >= 20
+
+        loadPokemonUseCase.execute(
+            page: currentPage,
+            searchText: searchText.isEmpty ? nil : searchText,
+            selectedSuperType: selectedSuperType,
+            selectedTypes: selectedTypes
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] completion in
+            guard let self = self else { return }
+            self.isRequestInProgress = false
+
+            if refresh {
+                self.isLoading = false
+            } else {
+                self.isLoadingMore = false
             }
-            .store(in: &cancellables)
+
+            if case let .failure(error) = completion {
+                self.errorMessage = error.localizedDescription
+                print("데이터 로드 실패: \(error.localizedDescription)")
+            }
+        } receiveValue: { [weak self] newPokemons in
+            guard let self = self else { return }
+
+            if refresh {
+                self.pokemons = newPokemons
+            } else {
+                let existingIds = Set(self.pokemons.map { $0.id })
+                let uniqueNewPokemons = newPokemons.filter { !existingIds.contains($0.id) }
+                self.pokemons.append(contentsOf: uniqueNewPokemons)
+            }
+
+            self.hasMoreData = newPokemons.count >= 20
+        }
+        .store(in: &cancellables)
     }
     
     func loadMoreIfNeeded() {
@@ -164,11 +164,15 @@ class PokemonListViewModel: ObservableObject {
         } else {
             selectedSuperType = type
         }
+        currentPage = 1
+        loadPokemons(refresh: true)
     }
     
     // 타입 선택
     func toggleTypeSelection(_ type: String) {
         selectedTypes.formSymmetricDifference([type])
+        currentPage = 1
+        loadPokemons(refresh: true)
     }
     
     private func setupSearchTextSubscription() {
