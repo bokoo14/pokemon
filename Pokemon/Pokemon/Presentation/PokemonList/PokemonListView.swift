@@ -10,7 +10,8 @@ import Swinject
 
 struct PokemonListView: View {
     @StateObject private var viewModel: PokemonListViewModel
-        
+    private let excludedSuperTypesForTypesFilter: [String] = ["Trainer"]
+    
     init() {
         let resolvedViewModel = DependencyContainer.shared.container.resolve(PokemonListViewModel.self)!
         _viewModel = StateObject(wrappedValue: resolvedViewModel)
@@ -32,7 +33,7 @@ struct PokemonListView: View {
                 .toggleStyle(.button)
                 .buttonStyle(PlainButtonStyle())
             }
-            .padding()
+            .padding(.horizontal, 10)
             
             // 검색창
             HStack {
@@ -46,8 +47,43 @@ struct PokemonListView: View {
             .padding(10)
             .background(Color(.systemGray6))
             .cornerRadius(10)
-            .padding(.horizontal)
-
+            .padding(.horizontal, 10)
+            
+            // Supertypes 필터
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(viewModel.superTypes, id: \.self) { superType in
+                        SelectableRoundedButton(
+                            title: superType,
+                            isSelected: viewModel.selectedSuperType == superType,
+                            action: {
+                                viewModel.handleSuperTypeSelection(superType)
+                            }
+                        )
+                    }
+                }
+                .padding(.horizontal, 10)
+            }
+            
+            // Types 필터 (Trainer가 아닌 경우만 노출)
+            if let selected = viewModel.selectedSuperType,
+               !excludedSuperTypesForTypesFilter.contains(selected) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(viewModel.types, id: \.self) { type in
+                            SelectableRoundedButton(
+                                title: type,
+                                isSelected: viewModel.selectedTypes.contains(type),
+                                action: {
+                                    viewModel.toggleTypeSelection(type)
+                                }
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                }
+            }
+            
             // 카드 리스트
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
@@ -62,7 +98,6 @@ struct PokemonListView: View {
                     if !viewModel.isShowFavoritesOnly {
                         if viewModel.isLoadingMore {
                             ProgressView()
-                                .gridCellColumns(2)
                         } else if viewModel.hasMoreData {
                             Color.clear
                                 .frame(height: 50)
@@ -73,7 +108,6 @@ struct PokemonListView: View {
                         }
                     }
                 }
-                .padding()
             }
         }
     }

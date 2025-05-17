@@ -1,5 +1,5 @@
 //
-//  LoadPokemonUseCase.swift
+//  FetchPokemonUseCase.swift
 //  Pokemon
 //
 //  Created by bokyung on 5/15/25.
@@ -8,11 +8,11 @@
 import Combine
 import Foundation
 
-protocol LoadPokemonUseCase {
+protocol FetchPokemonUseCase {
     func execute(page: Int, query: String?) -> AnyPublisher<[Pokemon], Error>
 }
 
-class LoadPokemonUseCaseImp: LoadPokemonUseCase {
+class FetchPokemonUseCaseImp: FetchPokemonUseCase {
     private let repository: PokemonCardRepository
     
     init(repository: PokemonCardRepository) {

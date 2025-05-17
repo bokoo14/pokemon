@@ -16,12 +16,18 @@ class PokemonListViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isLoadingMore: Bool = false
     @Published var hasMoreData: Bool = true
+    @Published var superTypes: [String] = []
+    @Published var types: [String] = []
+    @Published var selectedSuperType: String? = nil
+    @Published var selectedTypes: Set<String> = []
     
     private var cancellables = Set<AnyCancellable>()
-    private let loadPokemonUseCase: LoadPokemonUseCase
+    private let loadPokemonUseCase: FetchPokemonUseCase
+    private let fetchSupertypesUseCase: FetchSupertypesUseCase
+    private let fetchTypesUseCase: FetchTypesUseCase
     private var currentPage = 1
     private var isRequestInProgress = false
-
+    
     var filteredPokemons: [Pokemon] {
         var list = pokemons
         if isShowFavoritesOnly {
@@ -32,14 +38,49 @@ class PokemonListViewModel: ObservableObject {
         }
         return list
     }
-
-    init(loadPokemonUseCase: LoadPokemonUseCase) {
+    
+    init(
+        loadPokemonUseCase: FetchPokemonUseCase,
+        fetchSupertypesUseCase: FetchSupertypesUseCase,
+        fetchTypesUseCase: FetchTypesUseCase
+    ) {
         self.loadPokemonUseCase = loadPokemonUseCase
+        self.fetchSupertypesUseCase = fetchSupertypesUseCase
+        self.fetchTypesUseCase = fetchTypesUseCase
         setupSearchTextSubscription()
-        loadData()
+        loadSuperTypes()
+        loadTypes()
+        loadPokemons()
     }
-
-    func loadData(refresh: Bool = true) {
+    
+    func loadSuperTypes() {
+        fetchSupertypesUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                if case let .failure(error) = completion {
+                    print("Failed to load supertypes: \(error)")
+                }
+            } receiveValue: { [weak self] superTypes in
+                self?.superTypes = superTypes
+            }
+            .store(in: &cancellables)
+    }
+    
+    func loadTypes() {
+        fetchTypesUseCase.execute()
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                if case let .failure(error) = completion {
+                    print("Failed to load types: \(error)")
+                }
+            } receiveValue: { [weak self] types in
+                self?.types = types
+            }
+            .store(in: &cancellables)
+    }
+    
+    // 포켓몬 데이터 로드
+    func loadPokemons(refresh: Bool = true) {
         if isRequestInProgress { return }
         
         if refresh {
@@ -90,15 +131,10 @@ class PokemonListViewModel: ObservableObject {
         if isLoading || isLoadingMore || !hasMoreData || isRequestInProgress { return }
         
         currentPage += 1
-        loadData(refresh: false)
+        loadPokemons(refresh: false)
     }
     
-    func resetSearch() {
-        searchText = ""
-        currentPage = 1
-        loadData(refresh: true)
-    }
-
+    // 즐겨찾기
     func toggleFavorite(for pokemonId: String) {
         if let index = pokemons.firstIndex(where: { $0.id == pokemonId }) {
             let pokemon = pokemons[index]
@@ -113,6 +149,28 @@ class PokemonListViewModel: ObservableObject {
         }
     }
     
+    // 검색
+    func resetSearch() {
+        searchText = ""
+        currentPage = 1
+        loadPokemons(refresh: true)
+    }
+    
+    // 슈퍼타입 선택
+    func handleSuperTypeSelection(_ type: String) {
+        selectedTypes.removeAll()
+        if selectedSuperType == type {
+            selectedSuperType = nil
+        } else {
+            selectedSuperType = type
+        }
+    }
+    
+    // 타입 선택
+    func toggleTypeSelection(_ type: String) {
+        selectedTypes.formSymmetricDifference([type])
+    }
+    
     private func setupSearchTextSubscription() {
         $searchText
             .removeDuplicates()
@@ -122,9 +180,9 @@ class PokemonListViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-
+    
     private func handleSearchTextChanged() {
         currentPage = 1
-        loadData(refresh: true)
+        loadPokemons(refresh: true)
     }
 }

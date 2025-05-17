@@ -8,10 +8,6 @@
 import Alamofire
 import Foundation
 
-protocol NetworkService {
-    func request<R: Request>(_ request: R) async throws -> R.Output
-}
-
 class NetworkServiceImp: NetworkService {
     func request<R: Request>(_ request: R) async throws -> R.Output {
         return try await withCheckedThrowingContinuation { continuation in

@@ -34,18 +34,41 @@ class DependencyContainer {
             let networkService = resolver.resolve(NetworkService.self)!
             return PokemonCardRepositoryImp(baseURL: baseURL, networkService: networkService)
         }
+        container.register(SupertypesRepository.self) { resolver in
+            let baseURL = resolver.resolve(URL.self, name: "baseURL")!
+            let networkService = resolver.resolve(NetworkService.self)!
+            return SupertypesRepositoryImp(baseURL: baseURL, networkService: networkService)
+        }
+        container.register(TypesRepository.self) { resolver in
+            let baseURL = resolver.resolve(URL.self, name: "baseURL")!
+            let networkService = resolver.resolve(NetworkService.self)!
+            return TypesRepositoryImp(baseURL: baseURL, networkService: networkService)
+        }
         
         // UseCase
-        container.register(LoadPokemonUseCase.self) { resolver in
+        container.register(FetchPokemonUseCase.self) { resolver in
             let repository = resolver.resolve(PokemonCardRepository.self)!
-            return LoadPokemonUseCaseImp(repository: repository)
+            return FetchPokemonUseCaseImp(repository: repository)
+        }
+        container.register(FetchSupertypesUseCase.self) { resolver in
+            let repository = resolver.resolve(SupertypesRepository.self)!
+            return FetchSupertypesUseCaseImp(repository: repository)
+        }
+        container.register(FetchTypesUseCase.self) { resolver in
+            let repository = resolver.resolve(TypesRepository.self)!
+            return FetchTypesUseCaseImp(repository: repository)
         }
         
         // ViewModel
         container.register(PokemonListViewModel.self) { resolver in
-            let useCase = resolver.resolve(LoadPokemonUseCase.self)!
+            let fetchPokemonUseCase = resolver.resolve(FetchPokemonUseCase.self)!
+            let fetchSupertypesUseCase = resolver.resolve(FetchSupertypesUseCase.self)!
+            let fetchTypesUseCase = resolver.resolve(FetchTypesUseCase.self)!
             return PokemonListViewModel(
-                loadPokemonUseCase: useCase
+                loadPokemonUseCase: fetchPokemonUseCase,
+                fetchSupertypesUseCase: fetchSupertypesUseCase,
+                fetchTypesUseCase: fetchTypesUseCase
+                
             )
         }
     }
