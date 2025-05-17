@@ -87,14 +87,21 @@ struct PokemonListView: View {
             // 카드 리스트
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(viewModel.filteredPokemons) { pokemon in
-                        PokemonCardView(
-                            pokemon: pokemon,
-                            onToggleFavorite: {
-                                viewModel.toggleFavorite(for: pokemon.id)
-                            }
-                        )
+                    if viewModel.isLoading {
+                        ForEach(0..<10, id: \.self) { _ in
+                            SkeletonCardView()
+                        }
+                    } else {
+                        ForEach(viewModel.filteredPokemons) { pokemon in
+                            PokemonCardView(
+                                pokemon: pokemon,
+                                onToggleFavorite: {
+                                    viewModel.toggleFavorite(for: pokemon.id)
+                                }
+                            )
+                        }
                     }
+                    
                     if !viewModel.isShowFavoritesOnly {
                         if viewModel.isLoadingMore {
                             ProgressView()

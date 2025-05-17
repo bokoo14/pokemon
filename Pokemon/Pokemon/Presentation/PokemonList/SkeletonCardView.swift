@@ -12,7 +12,7 @@ struct SkeletonCardView: View {
         VStack {
             Rectangle()
                 .fill(Color.gray.opacity(0.3))
-                .aspectRatio(1, contentMode: .fit)
+                .aspectRatio(0.75, contentMode: .fit)
             
             Rectangle()
                 .fill(Color.gray.opacity(0.3))
