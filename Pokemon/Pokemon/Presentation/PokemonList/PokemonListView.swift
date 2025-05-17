@@ -10,16 +10,17 @@ import Swinject
 
 struct PokemonListView: View {
     @StateObject private var viewModel: PokemonListViewModel
+    
     private let excludedSuperTypesForTypesFilter: [String] = ["Trainer"]
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     
     init() {
         let resolvedViewModel = DependencyContainer.shared.container.resolve(PokemonListViewModel.self)!
         _viewModel = StateObject(wrappedValue: resolvedViewModel)
     }
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
     
     var body: some View {
         VStack {
