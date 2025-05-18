@@ -11,16 +11,3 @@ import Foundation
 protocol FetchSupertypesUseCase {
     func execute() -> AnyPublisher<[String], Error>
 }
-
-class FetchSupertypesUseCaseImp: FetchSupertypesUseCase {
-    private let repository: SupertypesRepository
-    
-    init(repository: SupertypesRepository) {
-        self.repository = repository
-    }
-    
-    func execute() -> AnyPublisher<[String], Error> {
-        return repository.fetchSupertypesPublisher()
-            .eraseToAnyPublisher()
-    }
-}
