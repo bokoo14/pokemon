@@ -66,6 +66,10 @@ class DependencyContainer {
             let repository = resolver.resolve(FavoritePokemonRepository.self)!
             return ToggleFavoriteFavoriteUseCaseImp(repository: repository)
         }
+        container.register(FetchFavoritePokemonUseCase.self) { resolver in
+            let repository = resolver.resolve(FavoritePokemonRepository.self)!
+            return FetchFavoritePokemonUseCaseImp(repository: repository)
+        }
         
         // ViewModel
         container.register(PokemonListViewModel.self) { resolver in
@@ -73,11 +77,13 @@ class DependencyContainer {
             let fetchSupertypesUseCase = resolver.resolve(FetchSupertypesUseCase.self)!
             let fetchTypesUseCase = resolver.resolve(FetchTypesUseCase.self)!
             let toggleFavoriteUseCase = resolver.resolve(ToggleFavoriteFavoriteUseCase.self)!
+            let fetchFavoritePokemonUseCase = resolver.resolve(FetchFavoritePokemonUseCase.self)!
             return PokemonListViewModel(
                 loadPokemonUseCase: fetchPokemonUseCase,
                 fetchSupertypesUseCase: fetchSupertypesUseCase,
                 fetchTypesUseCase: fetchTypesUseCase,
-                toggleFavoriteUseCase: toggleFavoriteUseCase
+                toggleFavoriteUseCase: toggleFavoriteUseCase,
+                fetchFavoritePokemonUseCase: fetchFavoritePokemonUseCase
                 
             )
         }

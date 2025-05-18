@@ -26,28 +26,31 @@ class PokemonListViewModel: ObservableObject {
     private let fetchSupertypesUseCase: FetchSupertypesUseCase
     private let fetchTypesUseCase: FetchTypesUseCase
     private let toggleFavoriteUseCase: ToggleFavoriteFavoriteUseCase
+    private let fetchFavoritePokemonUseCase: FetchFavoritePokemonUseCase
 
     private var currentPage = 1
     private var isRequestInProgress = false
     
     var filteredPokemons: [Pokemon] {
-        var list = pokemons
-        if isShowFavoritesOnly {
-            list = list.filter { $0.isFavorite }
-        }
-        return list
+        return pokemons
+            .filter(favoriteFilter)
+            .filter(superTypeFilter)
+            .filter(typesFilter)
     }
-    
+
     init(
         loadPokemonUseCase: FetchPokemonUseCase,
         fetchSupertypesUseCase: FetchSupertypesUseCase,
         fetchTypesUseCase: FetchTypesUseCase,
-        toggleFavoriteUseCase: ToggleFavoriteFavoriteUseCase
+        toggleFavoriteUseCase: ToggleFavoriteFavoriteUseCase,
+        fetchFavoritePokemonUseCase: FetchFavoritePokemonUseCase
     ) {
         self.loadPokemonUseCase = loadPokemonUseCase
         self.fetchSupertypesUseCase = fetchSupertypesUseCase
         self.fetchTypesUseCase = fetchTypesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.fetchFavoritePokemonUseCase = fetchFavoritePokemonUseCase
+        subscribeFavoriteFilter()
         subscribeSearchText()
         subscribeFilters()
         loadSuperTypes()
@@ -132,6 +135,26 @@ class PokemonListViewModel: ObservableObject {
         .store(in: &cancellables)
     }
     
+    // Coredata의 즐겨찾기 포켓몬 로드
+    func loadFavoritePokemons() {
+        isLoading = true
+        errorMessage = nil
+
+        fetchFavoritePokemonUseCase.execute()
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] completion in
+            guard let self = self else { return }
+            self.isLoading = false
+            if case let .failure(error) = completion {
+                self.errorMessage = error.localizedDescription
+            }
+        } receiveValue: { [weak self] favoritePokemons in
+            self?.pokemons = favoritePokemons
+            self?.hasMoreData = false
+        }
+        .store(in: &cancellables)
+    }
+
     func loadMoreIfNeeded() {
         if isLoading || isLoadingMore || !hasMoreData || isRequestInProgress { return }
         
@@ -150,15 +173,7 @@ class PokemonListViewModel: ObservableObject {
                         print("즐겨찾기 실패: \(error)")
                     }
                 } receiveValue: { [weak self] updatedIsFavorite in
-                    self?.pokemons[index] = Pokemon(
-                        id: pokemon.id,
-                        name: pokemon.name,
-                        supertype: pokemon.supertype,
-                        types: pokemon.types,
-                        imageURL: pokemon.imageURL,
-                        logoImage: pokemon.logoImage,
-                        isFavorite: updatedIsFavorite
-                    )
+                    self?.pokemons[index].isFavorite = updatedIsFavorite
                     print("즐겨찾기 추가/해제 성공: \(updatedIsFavorite)")
                 }
                 .store(in: &cancellables)
@@ -175,20 +190,24 @@ class PokemonListViewModel: ObservableObject {
     // 슈퍼타입 선택
     func handleSuperTypeSelection(_ type: String) {
         selectedTypes.removeAll()
-        if selectedSuperType == type {
-            selectedSuperType = nil
-        } else {
-            selectedSuperType = type
-        }
+        selectedSuperType = (selectedSuperType == type) ? nil : type
         currentPage = 1
-        loadPokemons(refresh: true)
+        if !isShowFavoritesOnly {
+            loadPokemons(refresh: true)
+        } else {
+            loadFavoritePokemons()
+        }
     }
     
     // 타입 선택
     func toggleTypeSelection(_ type: String) {
         selectedTypes.formSymmetricDifference([type])
         currentPage = 1
-        loadPokemons(refresh: true)
+        if !isShowFavoritesOnly {
+            loadPokemons(refresh: true)
+        } else {
+            loadFavoritePokemons()
+        }
     }
     
     // 필터 초기화
@@ -198,6 +217,21 @@ class PokemonListViewModel: ObservableObject {
         currentPage = 1
         isShowFavoritesOnly = false
         loadPokemons(refresh: true)
+    }
+    
+    // 즐겨찾기
+    private func subscribeFavoriteFilter() {
+        $isShowFavoritesOnly
+            .removeDuplicates()
+            .sink { [weak self] showFavorites in
+                guard let self = self else { return }
+                if showFavorites {
+                    self.loadFavoritePokemons()
+                } else {
+                    self.loadPokemons(refresh: true)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     // 검색
@@ -277,5 +311,21 @@ class PokemonListViewModel: ObservableObject {
     private func handleSearchTextChanged() {
         currentPage = 1
         loadPokemons(refresh: true)
+    }
+    
+    // 필터
+    private func favoriteFilter(_ pokemon: Pokemon) -> Bool {
+        return !isShowFavoritesOnly || pokemon.isFavorite
+    }
+    
+    private func superTypeFilter(_ pokemon: Pokemon) -> Bool {
+        guard let selectedSuperType = selectedSuperType else { return true }
+        return pokemon.supertype.contains(selectedSuperType)
+    }
+    
+    private func typesFilter(_ pokemon: Pokemon) -> Bool {
+        if selectedTypes.isEmpty { return true }
+        guard let pokemonTypes = pokemon.types else { return false }
+        return !selectedTypes.isDisjoint(with: Set(pokemonTypes))
     }
 }

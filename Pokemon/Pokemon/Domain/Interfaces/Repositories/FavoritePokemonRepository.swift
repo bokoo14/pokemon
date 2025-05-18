@@ -13,4 +13,5 @@ protocol FavoritePokemonRepository {
     func addFavorite(pokemon: Pokemon) -> AnyPublisher<Void, Error>
     func removeFavorite(pokemonId: String) -> AnyPublisher<Void, Error>
     func getFavoriteIds() -> AnyPublisher<[String], Error>
+    func getFavoritePokemons() -> AnyPublisher<[FavoritePokemon], Error>
 }

@@ -46,6 +46,8 @@
 		88A5AFF92DD9C00B004A5CD3 /* FetchSupertypesUseCaseImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFF82DD9C00B004A5CD3 /* FetchSupertypesUseCaseImp.swift */; };
 		88A5AFFB2DD9C011004A5CD3 /* FetchTypesUseCaseImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFFA2DD9C011004A5CD3 /* FetchTypesUseCaseImp.swift */; };
 		88A5AFFD2DD9C018004A5CD3 /* ToggleFavoriteFavoriteUseCaseImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFFC2DD9C018004A5CD3 /* ToggleFavoriteFavoriteUseCaseImp.swift */; };
+		88A5AFFF2DD9C1F3004A5CD3 /* FetchFavoritePokemonUseCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5AFFE2DD9C1F3004A5CD3 /* FetchFavoritePokemonUseCase.swift */; };
+		88A5B0012DD9C222004A5CD3 /* FetchFavoritePokemonUseCaseImp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88A5B0002DD9C222004A5CD3 /* FetchFavoritePokemonUseCaseImp.swift */; };
 		88FC33ED2DD58CCE006E18E5 /* PokemonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FC33DE2DD58CCE006E18E5 /* PokemonApp.swift */; };
 		88FC33EF2DD58CCE006E18E5 /* CoredataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FC33E92DD58CCE006E18E5 /* CoredataController.swift */; };
 		88FC33F02DD58CCE006E18E5 /* Pokemon.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 88FC33EA2DD58CCE006E18E5 /* Pokemon.xcdatamodeld */; };
@@ -109,6 +111,8 @@
 		88A5AFF82DD9C00B004A5CD3 /* FetchSupertypesUseCaseImp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchSupertypesUseCaseImp.swift; sourceTree = "<group>"; };
 		88A5AFFA2DD9C011004A5CD3 /* FetchTypesUseCaseImp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchTypesUseCaseImp.swift; sourceTree = "<group>"; };
 		88A5AFFC2DD9C018004A5CD3 /* ToggleFavoriteFavoriteUseCaseImp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleFavoriteFavoriteUseCaseImp.swift; sourceTree = "<group>"; };
+		88A5AFFE2DD9C1F3004A5CD3 /* FetchFavoritePokemonUseCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchFavoritePokemonUseCase.swift; sourceTree = "<group>"; };
+		88A5B0002DD9C222004A5CD3 /* FetchFavoritePokemonUseCaseImp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchFavoritePokemonUseCaseImp.swift; sourceTree = "<group>"; };
 		88FC33822DD5826B006E18E5 /* Pokemon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pokemon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88FC33972DD5826D006E18E5 /* PokemonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PokemonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		88FC33A12DD5826D006E18E5 /* PokemonUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PokemonUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -185,6 +189,7 @@
 				88A5AFC32DD78E2F004A5CD3 /* FetchSupertypesUseCase.swift */,
 				88A5AFCB2DD84B33004A5CD3 /* FetchTypesUseCase.swift */,
 				88A5AFF12DD9B3DE004A5CD3 /* ToggleFavoriteFavoriteUseCase.swift */,
+				88A5AFFE2DD9C1F3004A5CD3 /* FetchFavoritePokemonUseCase.swift */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -304,6 +309,7 @@
 				88A5AFF82DD9C00B004A5CD3 /* FetchSupertypesUseCaseImp.swift */,
 				88A5AFFA2DD9C011004A5CD3 /* FetchTypesUseCaseImp.swift */,
 				88A5AFFC2DD9C018004A5CD3 /* ToggleFavoriteFavoriteUseCaseImp.swift */,
+				88A5B0002DD9C222004A5CD3 /* FetchFavoritePokemonUseCaseImp.swift */,
 			);
 			path = UseCases;
 			sourceTree = "<group>";
@@ -590,6 +596,7 @@
 				88A5AFB42DD781E1004A5CD3 /* InfoRow.swift in Sources */,
 				88A5AFF92DD9C00B004A5CD3 /* FetchSupertypesUseCaseImp.swift in Sources */,
 				88FC33ED2DD58CCE006E18E5 /* PokemonApp.swift in Sources */,
+				88A5AFFF2DD9C1F3004A5CD3 /* FetchFavoritePokemonUseCase.swift in Sources */,
 				88A5AFFB2DD9C011004A5CD3 /* FetchTypesUseCaseImp.swift in Sources */,
 				88A5AFD02DD85282004A5CD3 /* SelectableRoundedButton.swift in Sources */,
 				88A5AF792DD5DF31004A5CD3 /* GetPokemontsRequest.swift in Sources */,
@@ -612,6 +619,7 @@
 				88A5AFC42DD78E2F004A5CD3 /* FetchSupertypesUseCase.swift in Sources */,
 				88A5AFCA2DD84B0E004A5CD3 /* TypesRepository.swift in Sources */,
 				88A5AFE72DD9A989004A5CD3 /* FavoritePokemonRepository.swift in Sources */,
+				88A5B0012DD9C222004A5CD3 /* FetchFavoritePokemonUseCaseImp.swift in Sources */,
 				88A5AFF22DD9B3DE004A5CD3 /* ToggleFavoriteFavoriteUseCase.swift in Sources */,
 				88A5AF9B2DD6BDD1004A5CD3 /* PokemonCardRepository.swift in Sources */,
 				88A5AF972DD6BB11004A5CD3 /* DependencyContainer.swift in Sources */,

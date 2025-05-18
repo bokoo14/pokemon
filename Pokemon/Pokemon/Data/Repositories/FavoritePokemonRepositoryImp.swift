@@ -81,6 +81,18 @@ class FavoritePokemonRepositoryImp: FavoritePokemonRepository {
         }
         .eraseToAnyPublisher()
     }
+    
+    func getFavoritePokemons() -> AnyPublisher<[FavoritePokemon], Error> {
+        Deferred {
+            Result {
+                let fetchRequest: NSFetchRequest<FavoritePokemon> = FavoritePokemon.fetchRequest()
+                return try self.viewContext.fetch(fetchRequest)
+            }
+            .mapError { RepositoryError.coreDataError($0) }
+            .publisher
+        }
+        .eraseToAnyPublisher()
+    }
 
     // MARK: Helper
     
