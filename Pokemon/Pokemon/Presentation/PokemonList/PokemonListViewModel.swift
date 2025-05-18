@@ -50,12 +50,9 @@ class PokemonListViewModel: ObservableObject {
         self.fetchTypesUseCase = fetchTypesUseCase
         self.toggleFavoriteUseCase = toggleFavoriteUseCase
         self.fetchFavoritePokemonUseCase = fetchFavoritePokemonUseCase
-        subscribeFavoriteFilter()
-        subscribeSearchText()
         subscribeFilters()
         loadSuperTypes()
         loadTypes()
-        loadPokemons()
     }
     
     func loadSuperTypes() {
@@ -192,22 +189,12 @@ class PokemonListViewModel: ObservableObject {
         selectedTypes.removeAll()
         selectedSuperType = (selectedSuperType == type) ? nil : type
         currentPage = 1
-        if !isShowFavoritesOnly {
-            loadPokemons(refresh: true)
-        } else {
-            loadFavoritePokemons()
-        }
     }
     
     // 타입 선택
     func toggleTypeSelection(_ type: String) {
         selectedTypes.formSymmetricDifference([type])
         currentPage = 1
-        if !isShowFavoritesOnly {
-            loadPokemons(refresh: true)
-        } else {
-            loadFavoritePokemons()
-        }
     }
     
     // 필터 초기화
@@ -216,100 +203,68 @@ class PokemonListViewModel: ObservableObject {
         selectedTypes.removeAll()
         currentPage = 1
         isShowFavoritesOnly = false
-        loadPokemons(refresh: true)
     }
-    
-    // 즐겨찾기
-    private func subscribeFavoriteFilter() {
-        $isShowFavoritesOnly
-            .removeDuplicates()
-            .sink { [weak self] showFavorites in
-                guard let self = self else { return }
-                if showFavorites {
-                    self.loadFavoritePokemons()
-                } else {
-                    self.loadPokemons(refresh: true)
-                }
-            }
-            .store(in: &cancellables)
-    }
-    
-    // 검색
-    private func subscribeSearchText() {
-        $searchText
-            .dropFirst()
-            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
-            .removeDuplicates()
-            .map { [weak self] text -> AnyPublisher<[Pokemon], Never> in
-                guard let self = self else {
-                    return Just([]).eraseToAnyPublisher()
-                }
 
-                self.isLoading = true
-                self.errorMessage = nil
-                self.currentPage = 1
-
-                return self.loadPokemonUseCase.execute(
-                    page: self.currentPage,
-                    searchText: text.isEmpty ? nil : text,
-                    selectedSuperType: self.selectedSuperType,
-                    selectedTypes: self.selectedTypes
-                )
-                .catch { error -> Just<[Pokemon]> in
-                    self.errorMessage = error.localizedDescription
-                    return Just([])
-                }
-                .receive(on: DispatchQueue.main)
-                .eraseToAnyPublisher()
-            }
-            .switchToLatest()
-            .sink { [weak self] newPokemons in
-                guard let self = self else { return }
-                self.pokemons = newPokemons
-                self.hasMoreData = newPokemons.count >= 20
-                self.isLoading = false
-            }
-            .store(in: &cancellables)
-    }
-    
-    // 필터 (슈퍼 타입 + 타입)
+    // 필터 구독
     private func subscribeFilters() {
-        Publishers.CombineLatest($selectedSuperType, $selectedTypes)
-            .dropFirst()
-            .removeDuplicates { lhs, rhs in
-                lhs.0 == rhs.0 && lhs.1 == rhs.1
+        Publishers.CombineLatest4(
+            $searchText
+                .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+                .removeDuplicates(),
+            $selectedSuperType.removeDuplicates(),
+            $selectedTypes.removeDuplicates(),
+            $isShowFavoritesOnly.removeDuplicates()
+        )
+        .map { [weak self] searchText, superType, types, showFavorites -> AnyPublisher<[Pokemon], Never> in
+            print("Filters:", searchText, superType ?? "nil", types, showFavorites)
+            self?.isLoading = true
+            guard let self = self else {
+                return Just([]).eraseToAnyPublisher()
             }
-            .map { [weak self] superType, types -> AnyPublisher<[Pokemon], Never> in
-                guard let self = self else { return Just([]).eraseToAnyPublisher() }
-                
-                self.isLoading = true
-                self.errorMessage = nil
-                self.currentPage = 1
-                
+
+            self.currentPage = 1
+            self.errorMessage = nil
+
+            if showFavorites {
+                return self.fetchFavoritePokemonUseCase.execute()
+                    .map { favoritePokemons in
+                        return favoritePokemons.filter { pokemon in
+                            let matchesSearch = searchText.isEmpty || pokemon.name.localizedCaseInsensitiveContains(searchText)
+                            let matchesSuperType = (superType == nil) || pokemon.supertype.contains(superType!)
+                            let matchesTypes = types.isEmpty || (pokemon.types?.contains(where: { types.contains($0) }) ?? false)
+                            return matchesSearch && matchesSuperType && matchesTypes
+                        }
+                    }
+                    .receive(on: DispatchQueue.main)
+                    .catch { error -> Just<[Pokemon]> in
+                        self.errorMessage = error.localizedDescription
+                        return Just([])
+                    }
+                    .eraseToAnyPublisher()
+            } else {
                 return self.loadPokemonUseCase.execute(
                     page: self.currentPage,
-                    searchText: self.searchText.isEmpty ? nil : self.searchText,
+                    searchText: searchText.isEmpty ? nil : searchText,
                     selectedSuperType: superType,
                     selectedTypes: types
                 )
+                .receive(on: DispatchQueue.main)
                 .catch { error -> Just<[Pokemon]> in
                     self.errorMessage = error.localizedDescription
                     return Just([])
                 }
-                .receive(on: DispatchQueue.main)
                 .eraseToAnyPublisher()
             }
-            .switchToLatest()
-            .sink { [weak self] newPokemons in
-                guard let self = self else { return }
-                
-                self.pokemons = newPokemons
-                self.hasMoreData = newPokemons.count >= 20
-                self.isLoading = false
-            }
-            .store(in: &cancellables)
+        }
+        .switchToLatest()
+        .sink { [weak self] newPokemons in
+            self?.pokemons = newPokemons
+            self?.hasMoreData = newPokemons.count >= 20
+            self?.isLoading = false
+        }
+        .store(in: &cancellables)
     }
-    
+
     private func handleSearchTextChanged() {
         currentPage = 1
         loadPokemons(refresh: true)
