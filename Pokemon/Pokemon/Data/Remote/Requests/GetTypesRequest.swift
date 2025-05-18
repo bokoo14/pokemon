@@ -1,0 +1,25 @@
+//
+//  GetTypesRequest.swift
+//  Pokemon
+//
+//  Created by bokyung on 5/17/25.
+//
+
+import Alamofire
+import Foundation
+
+struct GetTypesRequest: Request {
+    typealias Output = TypesResponse
+
+    let endpoint: URL
+    let method: HTTPMethod
+    let query: QueryItems
+    let header: HTTPHeaders
+
+    init(baseURL: URL) {
+        self.endpoint = baseURL.appendingPathComponent("/v2/types")
+        self.method = .get
+        self.query = [:]
+        self.header = [:]
+    }
+}
