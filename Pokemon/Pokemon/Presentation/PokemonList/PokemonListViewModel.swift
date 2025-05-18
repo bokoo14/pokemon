@@ -237,6 +237,7 @@ class PokemonListViewModel: ObservableObject {
     // 검색
     private func subscribeSearchText() {
         $searchText
+            .dropFirst()
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .removeDuplicates()
             .map { [weak self] text -> AnyPublisher<[Pokemon], Never> in
@@ -274,6 +275,7 @@ class PokemonListViewModel: ObservableObject {
     // 필터 (슈퍼 타입 + 타입)
     private func subscribeFilters() {
         Publishers.CombineLatest($selectedSuperType, $selectedTypes)
+            .dropFirst()
             .removeDuplicates { lhs, rhs in
                 lhs.0 == rhs.0 && lhs.1 == rhs.1
             }
