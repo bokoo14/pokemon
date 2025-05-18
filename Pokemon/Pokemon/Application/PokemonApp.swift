@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct PokemonApp: App {
-    let persistenceController = PersistenceController.shared
+    let persistenceController = CoredataController.shared
 
     var body: some Scene {
         WindowGroup {
