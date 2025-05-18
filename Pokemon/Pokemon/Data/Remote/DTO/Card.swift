@@ -40,8 +40,9 @@ extension Card {
         Pokemon(
             id: id,
             name: name,
-            imageURL: images.small.absoluteString,
+            supertype: supertype,
             types: types,
+            imageURL: images.small.absoluteString,
             logoImage: set.images.logo.absoluteString,
             isFavorite: isFavorite
         )

@@ -92,13 +92,13 @@ struct PokemonDetailView: View {
 
 #Preview("피카츄 이미지") {
     PokemonDetailView(pokemon:
-                        Pokemon(id: "ex13-10", name: "피카츄", imageURL: "https://images.pokemontcg.io/base1/58.png", types: ["Fire", "Metal", "Water", "Winter"], logoImage: "https://images.pokemontcg.io/ex13/logo.png", isFavorite: true),
+                        Pokemon(id: "ex13-10", name: "피카츄", supertype: "", types: ["Fire", "Metal", "Water", "Winter"], imageURL: "https://images.pokemontcg.io/base1/58.png",  logoImage: "https://images.pokemontcg.io/ex13/logo.png", isFavorite: true),
                       onToggleFavorite: {})
 }
 
 #Preview("이미지 없는 경우") {
     PokemonDetailView(pokemon:
-                        Pokemon(id: "ex13-10", name: "피카츄", imageURL: "", types: ["Fire", "Metal", "Water"], logoImage: "https://images.pokemontcg.io/ex13/logo.png", isFavorite: true),
+                        Pokemon(id: "ex13-10", name: "피카츄", supertype: "", types: ["Fire", "Metal", "Water"], imageURL: "", logoImage: "https://images.pokemontcg.io/ex13/logo.png", isFavorite: true),
                       onToggleFavorite: {}
     )
 }

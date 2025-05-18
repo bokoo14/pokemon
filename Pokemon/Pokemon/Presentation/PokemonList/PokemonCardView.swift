@@ -59,7 +59,7 @@ struct PokemonCardView: View {
 #Preview() {
     NavigationView {
         PokemonCardView(pokemon:
-                            Pokemon(id: "1", name: "포켓몬 1", imageURL: "https://images.pokemontcg.io/base1/58.png", types: [""], logoImage: "", isFavorite: true), onToggleFavorite: {}
+                            Pokemon(id: "1", name: "포켓몬 1", supertype: "", types: [""], imageURL: "https://images.pokemontcg.io/base1/58.png", logoImage: "", isFavorite: true), onToggleFavorite: {}
         )
     }
 }

@@ -41,9 +41,10 @@ class FavoritePokemonRepositoryImp: FavoritePokemonRepository {
                 let favorite = FavoritePokemon(context: self.viewContext)
                 favorite.id = pokemon.id
                 favorite.name = pokemon.name
+                favorite.types = pokemon.types as NSArray?
+                favorite.supertype = pokemon.supertype
                 favorite.imageURL = pokemon.imageURL
                 favorite.logoImage = pokemon.logoImage
-                favorite.types = pokemon.types as NSArray?
 
                 try self.viewContext.save()
             }

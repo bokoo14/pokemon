@@ -153,8 +153,9 @@ class PokemonListViewModel: ObservableObject {
                     self?.pokemons[index] = Pokemon(
                         id: pokemon.id,
                         name: pokemon.name,
-                        imageURL: pokemon.imageURL,
+                        supertype: pokemon.supertype,
                         types: pokemon.types,
+                        imageURL: pokemon.imageURL,
                         logoImage: pokemon.logoImage,
                         isFavorite: updatedIsFavorite
                     )

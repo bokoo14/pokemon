@@ -10,8 +10,9 @@ import Foundation
 struct Pokemon: Identifiable {
     let id: String
     let name: String
-    let imageURL: String
+    let supertype: String
     let types: [String]?
+    let imageURL: String
     let logoImage: String
     var isFavorite: Bool
 }

@@ -6,6 +6,7 @@
         <attribute name="isFavorite" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="logoImage" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
+        <attribute name="supertype" attributeType="String"/>
         <attribute name="types" optional="YES" attributeType="Transformable" valueTransformerName="StringArrayTransformer"/>
     </entity>
 </model>
