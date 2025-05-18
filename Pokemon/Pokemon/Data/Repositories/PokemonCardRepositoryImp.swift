@@ -7,15 +7,18 @@
 
 import Alamofire
 import Combine
+import CoreData
 import Foundation
 
 class PokemonCardRepositoryImp: PokemonCardRepository {
     private let baseURL: URL
     private let networkService: NetworkService
-    
-    init(baseURL: URL, networkService: NetworkService) {
+    private let context: NSManagedObjectContext
+
+    init(baseURL: URL, networkService: NetworkService, context: NSManagedObjectContext) {
         self.baseURL = baseURL
         self.networkService = networkService
+        self.context = context
     }
     
     func fetchCards(page: Int, searchText: String?, selectedSuperType: String?, selectedTypes: Set<String>) async throws -> [Pokemon] {
@@ -27,7 +30,19 @@ class PokemonCardRepositoryImp: PokemonCardRepository {
             selectedTypes: selectedTypes
         )
         let response = try await networkService.request(request)
-        return response.data.map { $0.toDomain() }
+        let fetchedPokemons = response.data.map { $0.toDomain() }
+        let favoritePokemonIds = fetchFavoritePokemonIds()
+        
+        return fetchedPokemons.map { pokemon in
+            Pokemon(
+                id: pokemon.id,
+                name: pokemon.name,
+                imageURL: pokemon.imageURL,
+                types: pokemon.types,
+                logoImage: pokemon.logoImage,
+                isFavorite: favoritePokemonIds.contains(pokemon.id)
+            )
+        }
     }
     
     func fetchCardsPublisher(page: Int, searchText: String?, selectedSuperType: String?, selectedTypes: Set<String>) -> AnyPublisher<[Pokemon], Error> {
@@ -47,5 +62,18 @@ class PokemonCardRepositoryImp: PokemonCardRepository {
             }
         }
         .eraseToAnyPublisher()
+    }
+
+    // MARK: Helper
+    
+    private func fetchFavoritePokemonIds() -> Set<String> {
+        let fetchRequest: NSFetchRequest<FavoritePokemon> = FavoritePokemon.fetchRequest()
+        do {
+            let favorites = try context.fetch(fetchRequest)
+            return Set(favorites.compactMap { $0.id })
+        } catch {
+            print("CoreData fetch error:", error)
+            return []
+        }
     }
 }

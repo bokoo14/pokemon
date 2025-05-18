@@ -25,6 +25,8 @@ class PokemonListViewModel: ObservableObject {
     private let loadPokemonUseCase: FetchPokemonUseCase
     private let fetchSupertypesUseCase: FetchSupertypesUseCase
     private let fetchTypesUseCase: FetchTypesUseCase
+    private let toggleFavoriteUseCase: ToggleFavoriteFavoriteUseCase
+
     private var currentPage = 1
     private var isRequestInProgress = false
     
@@ -39,11 +41,13 @@ class PokemonListViewModel: ObservableObject {
     init(
         loadPokemonUseCase: FetchPokemonUseCase,
         fetchSupertypesUseCase: FetchSupertypesUseCase,
-        fetchTypesUseCase: FetchTypesUseCase
+        fetchTypesUseCase: FetchTypesUseCase,
+        toggleFavoriteUseCase: ToggleFavoriteFavoriteUseCase
     ) {
         self.loadPokemonUseCase = loadPokemonUseCase
         self.fetchSupertypesUseCase = fetchSupertypesUseCase
         self.fetchTypesUseCase = fetchTypesUseCase
+        self.toggleFavoriteUseCase = toggleFavoriteUseCase
         subscribeSearchText()
         subscribeFilters()
         loadSuperTypes()
@@ -135,22 +139,32 @@ class PokemonListViewModel: ObservableObject {
         loadPokemons(refresh: false)
     }
     
-    // 즐겨찾기
+    // 즐겨찾기 추가/해제
     func toggleFavorite(for pokemonId: String) {
         if let index = pokemons.firstIndex(where: { $0.id == pokemonId }) {
             let pokemon = pokemons[index]
-            pokemons[index] = Pokemon(
-                id: pokemon.id,
-                name: pokemon.name,
-                imageURL: pokemon.imageURL,
-                types: pokemon.types,
-                logoImage: pokemon.logoImage,
-                isFavorite: !pokemon.isFavorite
-            )
+            toggleFavoriteUseCase.execute(pokemon: pokemon)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    if case let .failure(error) = completion {
+                        print("즐겨찾기 실패: \(error)")
+                    }
+                } receiveValue: { [weak self] updatedIsFavorite in
+                    self?.pokemons[index] = Pokemon(
+                        id: pokemon.id,
+                        name: pokemon.name,
+                        imageURL: pokemon.imageURL,
+                        types: pokemon.types,
+                        logoImage: pokemon.logoImage,
+                        isFavorite: updatedIsFavorite
+                    )
+                    print("즐겨찾기 추가/해제 성공: \(updatedIsFavorite)")
+                }
+                .store(in: &cancellables)
         }
     }
     
-    // 검색
+    // 검색 초기화
     func resetSearch() {
         searchText = ""
         currentPage = 1

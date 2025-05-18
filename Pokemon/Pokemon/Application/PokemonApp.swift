@@ -10,6 +10,10 @@ import SwiftUI
 @main
 struct PokemonApp: App {
     let persistenceController = CoredataController.shared
+    
+    init() {
+        ValueTransformer.setValueTransformer(StringArrayTransformer(), forName: NSValueTransformerName("StringArrayTransformer"))
+    }
 
     var body: some Scene {
         WindowGroup {

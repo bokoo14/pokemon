@@ -22,7 +22,7 @@ class DependencyContainer {
         container.register(URL.self, name: "baseURL") { _ in
             return URL(string: "https://api.pokemontcg.io")!
         }
-
+        
         // Service
         container.register(NetworkService.self) { _ in
             return NetworkServiceImp()
@@ -32,7 +32,7 @@ class DependencyContainer {
         container.register(PokemonCardRepository.self) { resolver in
             let baseURL = resolver.resolve(URL.self, name: "baseURL")!
             let networkService = resolver.resolve(NetworkService.self)!
-            return PokemonCardRepositoryImp(baseURL: baseURL, networkService: networkService)
+            return PokemonCardRepositoryImp(baseURL: baseURL, networkService: networkService, context: CoredataController.shared.container.viewContext)
         }
         container.register(SupertypesRepository.self) { resolver in
             let baseURL = resolver.resolve(URL.self, name: "baseURL")!
@@ -43,6 +43,10 @@ class DependencyContainer {
             let baseURL = resolver.resolve(URL.self, name: "baseURL")!
             let networkService = resolver.resolve(NetworkService.self)!
             return TypesRepositoryImp(baseURL: baseURL, networkService: networkService)
+        }
+        container.register(FavoritePokemonRepository.self) { resolver in
+            let viewContext = CoredataController.shared.container.viewContext
+            return FavoritePokemonRepositoryImp(viewContext: viewContext)
         }
         
         // UseCase
@@ -58,16 +62,22 @@ class DependencyContainer {
             let repository = resolver.resolve(TypesRepository.self)!
             return FetchTypesUseCaseImp(repository: repository)
         }
+        container.register(ToggleFavoriteFavoriteUseCase.self) { resolver in
+            let repository = resolver.resolve(FavoritePokemonRepository.self)!
+            return ToggleFavoriteFavoriteUseCaseImp(repository: repository)
+        }
         
         // ViewModel
         container.register(PokemonListViewModel.self) { resolver in
             let fetchPokemonUseCase = resolver.resolve(FetchPokemonUseCase.self)!
             let fetchSupertypesUseCase = resolver.resolve(FetchSupertypesUseCase.self)!
             let fetchTypesUseCase = resolver.resolve(FetchTypesUseCase.self)!
+            let toggleFavoriteUseCase = resolver.resolve(ToggleFavoriteFavoriteUseCase.self)!
             return PokemonListViewModel(
                 loadPokemonUseCase: fetchPokemonUseCase,
                 fetchSupertypesUseCase: fetchSupertypesUseCase,
-                fetchTypesUseCase: fetchTypesUseCase
+                fetchTypesUseCase: fetchTypesUseCase,
+                toggleFavoriteUseCase: toggleFavoriteUseCase
                 
             )
         }
