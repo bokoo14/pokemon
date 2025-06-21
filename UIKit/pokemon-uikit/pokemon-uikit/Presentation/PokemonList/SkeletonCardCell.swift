@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import Then
 
-class SkeletonCardCell: UICollectionViewCell {
+final class SkeletonCardCell: UICollectionViewCell {
 
     private let imagePlaceholder = UIView().then {
         $0.backgroundColor = UIColor.gray.withAlphaComponent(0.3)

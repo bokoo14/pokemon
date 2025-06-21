@@ -10,7 +10,7 @@ import Combine
 import SnapKit
 import Then
 
-class PokemonListViewController: UIViewController {
+final class PokemonListViewController: UIViewController {
     
     private let viewModel: PokemonListViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -82,7 +82,6 @@ class PokemonListViewController: UIViewController {
         view.addSubview(typeScrollView)
         view.addSubview(collectionView)
         
-        // 검색창, 즐겨찾기
         topHStack.addArrangedSubview(searchBar)
         topHStack.addArrangedSubview(favoriteToggleButton)
         topHStack.snp.makeConstraints {
@@ -93,7 +92,6 @@ class PokemonListViewController: UIViewController {
         searchBar.setContentHuggingPriority(.defaultLow, for: .horizontal)
         favoriteToggleButton.setContentHuggingPriority(.required, for: .horizontal)
         
-        // 슈퍼 타입
         supertypeScrollView.addSubview(supertypeStackView)
         supertypeScrollView.snp.makeConstraints {
             $0.top.equalTo(searchBar.snp.bottom).offset(10)
@@ -105,7 +103,6 @@ class PokemonListViewController: UIViewController {
             $0.height.equalToSuperview()
         }
         
-        // 타입
         typeScrollView.addSubview(typeStackView)
         typeScrollView.snp.makeConstraints {
             $0.top.equalTo(supertypeScrollView.snp.bottom).offset(10)
@@ -117,7 +114,6 @@ class PokemonListViewController: UIViewController {
             $0.height.equalToSuperview()
         }
         
-        // 카드 컬렉션 뷰
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.snp.makeConstraints {
@@ -174,7 +170,6 @@ class PokemonListViewController: UIViewController {
                 self?.setupTypeButtons(types: self?.viewModel.types ?? [])
             }
             .store(in: &cancellables)
-        
     }
     
     private func setupSupertypeButtons(types: [String]) {
@@ -210,7 +205,6 @@ class PokemonListViewController: UIViewController {
         }
     }
     
-    
     @objc private func toggleFavorites() {
         viewModel.isShowFavoritesOnly.toggle()
     }
@@ -231,10 +225,7 @@ extension PokemonListViewController: UICollectionViewDataSource, UICollectionVie
         return viewModel.isLoading ? 10 : viewModel.filteredPokemons.count
     }
     
-    func collectionView(
-        _ collectionView: UICollectionView,
-        cellForItemAt indexPath: IndexPath
-    ) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if viewModel.isLoading {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SkeletonCardCell", for: indexPath) as! SkeletonCardCell
             return cell
@@ -249,10 +240,18 @@ extension PokemonListViewController: UICollectionViewDataSource, UICollectionVie
         return cell
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width = (collectionView.bounds.width - 30) / 2
         return CGSize(width: width, height: width * 1.3)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard !viewModel.isLoading else { return }
+        let pokemon = viewModel.filteredPokemons[indexPath.item]
+        let detailVC = PokemonDetailViewController(pokemon: pokemon) { [weak self] in
+            self?.viewModel.toggleFavorite(for: pokemon.id)
+        }
+        navigationController?.pushViewController(detailVC, animated: true)
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

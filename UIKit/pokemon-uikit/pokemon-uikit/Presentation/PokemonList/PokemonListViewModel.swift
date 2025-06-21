@@ -8,7 +8,7 @@
 import Combine
 import Foundation
 
-class PokemonListViewModel: ObservableObject {
+final class PokemonListViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published var isShowFavoritesOnly: Bool = false
     @Published var isLoading: Bool = false
