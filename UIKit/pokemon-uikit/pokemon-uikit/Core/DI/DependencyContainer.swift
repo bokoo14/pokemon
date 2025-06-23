@@ -32,43 +32,43 @@ class DependencyContainer {
         container.register(PokemonCardRepository.self) { resolver in
             let baseURL = resolver.resolve(URL.self, name: "baseURL")!
             let networkService = resolver.resolve(NetworkService.self)!
-            return PokemonCardRepositoryImp(baseURL: baseURL, networkService: networkService, context: CoredataController.shared.container.viewContext)
+            return PokemonCardRepositoryImpl(baseURL: baseURL, networkService: networkService, context: CoredataController.shared.container.viewContext)
         }
         container.register(SupertypesRepository.self) { resolver in
             let baseURL = resolver.resolve(URL.self, name: "baseURL")!
             let networkService = resolver.resolve(NetworkService.self)!
-            return SupertypesRepositoryImp(baseURL: baseURL, networkService: networkService)
+            return SupertypesRepositoryImpl(baseURL: baseURL, networkService: networkService)
         }
         container.register(TypesRepository.self) { resolver in
             let baseURL = resolver.resolve(URL.self, name: "baseURL")!
             let networkService = resolver.resolve(NetworkService.self)!
-            return TypesRepositoryImp(baseURL: baseURL, networkService: networkService)
+            return TypesRepositoryImpl(baseURL: baseURL, networkService: networkService)
         }
         container.register(FavoritePokemonRepository.self) { resolver in
             let viewContext = CoredataController.shared.container.viewContext
-            return FavoritePokemonRepositoryImp(viewContext: viewContext)
+            return FavoritePokemonRepositoryImpl(viewContext: viewContext)
         }
         
         // UseCase
         container.register(FetchPokemonUseCase.self) { resolver in
             let repository = resolver.resolve(PokemonCardRepository.self)!
-            return FetchPokemonUseCaseImp(repository: repository)
+            return FetchPokemonUseCaseImpl(repository: repository)
         }
         container.register(FetchSupertypesUseCase.self) { resolver in
             let repository = resolver.resolve(SupertypesRepository.self)!
-            return FetchSupertypesUseCaseImp(repository: repository)
+            return FetchSupertypesUseCaseImpl(repository: repository)
         }
         container.register(FetchTypesUseCase.self) { resolver in
             let repository = resolver.resolve(TypesRepository.self)!
-            return FetchTypesUseCaseImp(repository: repository)
+            return FetchTypesUseCaseImpl(repository: repository)
         }
         container.register(ToggleFavoriteFavoriteUseCase.self) { resolver in
             let repository = resolver.resolve(FavoritePokemonRepository.self)!
-            return ToggleFavoriteFavoriteUseCaseImp(repository: repository)
+            return ToggleFavoriteFavoriteUseCaseImpl(repository: repository)
         }
         container.register(FetchFavoritePokemonUseCase.self) { resolver in
             let repository = resolver.resolve(FavoritePokemonRepository.self)!
-            return FetchFavoritePokemonUseCaseImp(repository: repository)
+            return FetchFavoritePokemonUseCaseImpl(repository: repository)
         }
         
         // ViewModel

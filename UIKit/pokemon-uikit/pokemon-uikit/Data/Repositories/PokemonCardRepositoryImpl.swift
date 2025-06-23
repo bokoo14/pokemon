@@ -10,7 +10,7 @@ import Combine
 import CoreData
 import Foundation
 
-class PokemonCardRepositoryImp: PokemonCardRepository {
+class PokemonCardRepositoryImpl: PokemonCardRepository {
     private let baseURL: URL
     private let networkService: NetworkService
     private let context: NSManagedObjectContext

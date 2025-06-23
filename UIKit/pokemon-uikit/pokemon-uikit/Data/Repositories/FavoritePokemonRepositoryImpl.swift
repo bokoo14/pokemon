@@ -14,7 +14,7 @@ enum RepositoryError: Error {
     case coreDataError(Error)
 }
 
-class FavoritePokemonRepositoryImp: FavoritePokemonRepository {
+class FavoritePokemonRepositoryImpl: FavoritePokemonRepository {
     private let viewContext: NSManagedObjectContext
     
     init(viewContext: NSManagedObjectContext) {

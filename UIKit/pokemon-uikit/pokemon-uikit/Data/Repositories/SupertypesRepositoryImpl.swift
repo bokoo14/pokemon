@@ -1,5 +1,5 @@
 //
-//  TypesRepositoryImp.swift
+//  SupertypesRepositoryImp.swift
 //  Pokemon
 //
 //  Created by bokyung on 5/17/25.
@@ -9,7 +9,7 @@ import Alamofire
 import Combine
 import Foundation
 
-class TypesRepositoryImp: TypesRepository {
+class SupertypesRepositoryImpl: SupertypesRepository {
     private let baseURL: URL
     private let networkService: NetworkService
     
@@ -18,30 +18,28 @@ class TypesRepositoryImp: TypesRepository {
         self.networkService = networkService
     }
     
-    func fetchTypes() async throws -> [String] {
-        let request = GetTypesRequest(
+    func fetchSupertypes() async throws -> [String] {
+        let request = GetSupertypesRequest(
             baseURL: baseURL
         )
         let response = try await networkService.request(request)
         return response.data
     }
     
-    func fetchTypesPublisher() -> AnyPublisher<[String], Error> {
+    func fetchSupertypesPublisher() -> AnyPublisher<[String], Error> {
         return Future<[String], Error> { [weak self] promise in
-            guard let self = self else {
-                promise(.failure(NSError(domain: "Repository deallocated", code: -1)))
-                return
-            }
+            guard let self else { return }
             
             Task {
                 do {
-                    let supertypes = try await self.fetchTypes()
+                    let supertypes = try await self.fetchSupertypes()
                     promise(.success(supertypes))
                 } catch {
-                    promise(.failure(error))
+                    throw error
                 }
             }
         }
         .eraseToAnyPublisher()
     }
 }
+
