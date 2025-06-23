@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import CombineCocoa
 import SnapKit
 import Then
 
@@ -120,12 +121,25 @@ final class PokemonListViewController: UIViewController {
             $0.top.equalTo(typeScrollView.snp.bottom).offset(10)
             $0.leading.trailing.bottom.equalToSuperview()
         }
-        
-        favoriteToggleButton.addTarget(self, action: #selector(toggleFavorites), for: .touchUpInside)
-        searchBar.delegate = self
     }
     
     private func bindViewModel() {
+        favoriteToggleButton
+            .touchPublisher
+            .sink { [weak self] _ in
+                self?.viewModel.isShowFavoritesOnly.toggle()
+            }
+            .store(in: &cancellables)
+        
+        searchBar
+            .textDidChangePublisher
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .removeDuplicates()
+            .sink { [weak self] text in
+                self?.viewModel.searchText = text
+            }
+            .store(in: &cancellables)
+        
         viewModel.$pokemons
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
@@ -175,7 +189,7 @@ final class PokemonListViewController: UIViewController {
     private func setupSupertypeButtons(types: [String]) {
         supertypeStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for type in types {
-            let button = makeFilterButton(title: type, action: #selector(supertypeButtonTapped(_:)))
+            let button = makeFilterButton(title: type, isSupertype: true)
             supertypeStackView.addArrangedSubview(button)
         }
     }
@@ -183,40 +197,35 @@ final class PokemonListViewController: UIViewController {
     private func setupTypeButtons(types: [String]) {
         typeStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         for type in types {
-            let button = makeFilterButton(title: type, action: #selector(typeButtonTapped(_:)))
+            let button = makeFilterButton(title: type, isSupertype: false)
             typeStackView.addArrangedSubview(button)
         }
     }
     
-    private func makeFilterButton(title: String, action: Selector) -> UIButton {
-        let isSelected: Bool
-        if action == #selector(supertypeButtonTapped(_:)) {
-            isSelected = viewModel.selectedSuperType == title
-        } else {
-            isSelected = viewModel.selectedTypes.contains(title)
-        }
+    private func makeFilterButton(title: String, isSupertype: Bool) -> UIButton {
+        let isSelected: Bool = isSupertype
+            ? viewModel.selectedSuperType == title
+            : viewModel.selectedTypes.contains(title)
         
-        return UIButton(type: .system).then {
+        let button = UIButton(type: .system).then {
             $0.setTitle(title, for: .normal)
             $0.setTitleColor(isSelected ? .white : .black, for: .normal)
             $0.backgroundColor = isSelected ? .black : .systemGray5
             $0.layer.cornerRadius = 4
-            $0.addTarget(self, action: action, for: .touchUpInside)
         }
-    }
-    
-    @objc private func toggleFavorites() {
-        viewModel.isShowFavoritesOnly.toggle()
-    }
-    
-    @objc private func supertypeButtonTapped(_ sender: UIButton) {
-        guard let title = sender.currentTitle else { return }
-        viewModel.handleSuperTypeSelection(title)
-    }
-    
-    @objc private func typeButtonTapped(_ sender: UIButton) {
-        guard let title = sender.currentTitle else { return }
-        viewModel.toggleTypeSelection(title)
+        
+        button.touchPublisher
+            .sink { [weak self] _ in
+                guard let self else { return }
+                if isSupertype {
+                    self.viewModel.handleSuperTypeSelection(title)
+                } else {
+                    self.viewModel.toggleTypeSelection(title)
+                }
+            }
+            .store(in: &cancellables)
+        
+        return button
     }
 }
 
@@ -262,11 +271,5 @@ extension PokemonListViewController: UICollectionViewDataSource, UICollectionVie
         if offsetY > contentHeight - height - 100 {
             viewModel.loadMoreIfNeeded()
         }
-    }
-}
-
-extension PokemonListViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.searchText = searchText
     }
 }

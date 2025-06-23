@@ -1,5 +1,5 @@
 {
-  "originHash" : "76fe0273ee6039b3d744a9e0d23252a04a6f0fe2736c6f745b90d8d7e53e8809",
+  "originHash" : "55d57e080494866cbf143c9d2467e00a721ab685df679f3cc6a5e4199a968e8b",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "513364f870f6bfc468f9d2ff0a95caccc10044c5",
         "version" : "5.10.2"
+      }
+    },
+    {
+      "identity" : "combinecocoa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/CombineCommunity/CombineCocoa.git",
+      "state" : {
+        "revision" : "7300c75ff9e072aa7fd0fccefcc88f74aae9bf56",
+        "version" : "0.4.1"
       }
     },
     {

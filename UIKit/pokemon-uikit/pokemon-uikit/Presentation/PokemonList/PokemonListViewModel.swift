@@ -58,11 +58,10 @@ final class PokemonListViewModel: ObservableObject {
     func loadSuperTypes() {
         fetchSupertypesUseCase.execute()
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                if case let .failure(error) = completion {
-                    print("Failed to load supertypes: \(error)")
-                }
-            } receiveValue: { [weak self] superTypes in
+            .catch { error -> Just<[String]> in
+                return Just([])
+            }
+            .sink { [weak self] superTypes in
                 self?.superTypes = superTypes
             }
             .store(in: &cancellables)

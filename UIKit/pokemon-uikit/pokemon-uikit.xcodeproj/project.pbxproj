@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		880D757D2E098E2E003F3EF3 /* CombineCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 880D757C2E098E2E003F3EF3 /* CombineCocoa */; };
 		888359172E0677FF001514CC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 888359162E0677FF001514CC /* Kingfisher */; };
 		8883591F2E06783F001514CC /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 8883591E2E06783F001514CC /* Then */; };
 		888359222E067892001514CC /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 888359212E067892001514CC /* SnapKit */; };
@@ -48,6 +49,7 @@
 				888359222E067892001514CC /* SnapKit in Frameworks */,
 				8883591F2E06783F001514CC /* Then in Frameworks */,
 				888359172E0677FF001514CC /* Kingfisher in Frameworks */,
+				880D757D2E098E2E003F3EF3 /* CombineCocoa in Frameworks */,
 				888359252E06789B001514CC /* Swinject in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -96,6 +98,7 @@
 				888359212E067892001514CC /* SnapKit */,
 				888359242E06789B001514CC /* Swinject */,
 				888359272E0678A7001514CC /* Alamofire */,
+				880D757C2E098E2E003F3EF3 /* CombineCocoa */,
 			);
 			productName = "pokemon-uikit";
 			productReference = 888358792E067562001514CC /* pokemon-uikit.app */;
@@ -131,6 +134,7 @@
 				888359202E067892001514CC /* XCRemoteSwiftPackageReference "SnapKit" */,
 				888359232E06789B001514CC /* XCRemoteSwiftPackageReference "Swinject" */,
 				888359262E0678A7001514CC /* XCRemoteSwiftPackageReference "Alamofire" */,
+				880D757B2E098E2E003F3EF3 /* XCRemoteSwiftPackageReference "CombineCocoa" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8883587A2E067562001514CC /* Products */;
@@ -364,6 +368,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		880D757B2E098E2E003F3EF3 /* XCRemoteSwiftPackageReference "CombineCocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CombineCommunity/CombineCocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.4.1;
+			};
+		};
 		888359152E0677FF001514CC /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -407,6 +419,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		880D757C2E098E2E003F3EF3 /* CombineCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 880D757B2E098E2E003F3EF3 /* XCRemoteSwiftPackageReference "CombineCocoa" */;
+			productName = CombineCocoa;
+		};
 		888359162E0677FF001514CC /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 888359152E0677FF001514CC /* XCRemoteSwiftPackageReference "Kingfisher" */;

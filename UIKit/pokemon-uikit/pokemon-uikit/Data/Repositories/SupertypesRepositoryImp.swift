@@ -28,20 +28,18 @@ class SupertypesRepositoryImp: SupertypesRepository {
     
     func fetchSupertypesPublisher() -> AnyPublisher<[String], Error> {
         return Future<[String], Error> { [weak self] promise in
-            guard let self = self else {
-                promise(.failure(NSError(domain: "Repository deallocated", code: -1)))
-                return
-            }
+            guard let self else { return }
             
             Task {
                 do {
                     let supertypes = try await self.fetchSupertypes()
                     promise(.success(supertypes))
                 } catch {
-                    promise(.failure(error))
+                    throw error
                 }
             }
         }
         .eraseToAnyPublisher()
     }
 }
+
