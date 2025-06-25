@@ -141,14 +141,14 @@ final class PokemonListViewController: UIViewController {
             .store(in: &cancellables)
         
         viewModel.$pokemons
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.collectionView.reloadData()
             }
             .store(in: &cancellables)
         
         viewModel.$isShowFavoritesOnly
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] isFav in
                 let symbol = isFav ? "star.fill" : "star"
                 let color = isFav ? UIColor.systemYellow : UIColor.gray
@@ -158,28 +158,28 @@ final class PokemonListViewController: UIViewController {
             .store(in: &cancellables)
         
         viewModel.$superTypes
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] types in
                 self?.setupSupertypeButtons(types: types)
             }
             .store(in: &cancellables)
         
         viewModel.$types
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] types in
                 self?.setupTypeButtons(types: types)
             }
             .store(in: &cancellables)
         
         viewModel.$selectedSuperType
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.setupSupertypeButtons(types: self?.viewModel.superTypes ?? [])
             }
             .store(in: &cancellables)
         
         viewModel.$selectedTypes
-            .receive(on: RunLoop.main)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.setupTypeButtons(types: self?.viewModel.types ?? [])
             }
